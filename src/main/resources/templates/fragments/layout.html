@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<!--	
+	◯Thymeleaf部品の作成
+	th:fragment：layoutという名前でThymeleaf部品を生成。layoutを使用する時はtemplateとmenuの2つの引数を渡す
+	xmlns:th：タイムリーフを使用する宣言
+-->
+<html th:fragment="layout (template, menu)" xmlns:th="https://www.thymeleaf.org">
+	
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">　　<!--レスポンシブ対応の指定-->
+<!--
+	◯ファビコン（ブラウザのタブ表示用アイコン）の指定
+	th:href：URLをThymeleafで生成
+	→動的に生成されるため開発環境から本番環境に変わったりした際にもHTMLの編集が不要
+-->
+<link rel="shortcut icon" type="image/x-icon" th:href="@{/resources/images/favicon.png}">
+<!--
+	◯ページタイトルの作成
+	th:text="#{layoutTitle}"：layoutTytleという名前の文章をmessage.propertiesから取得して表示　※今回は指定なし
+	${...} → Javaの変数などを取得
+	#{...} → メッセージ（properties）を取得
+	@{...} → URLを生成
+	*{...} → フォームの値を取得
+	~{...} →HTML部品を格納（箱に出し入れ）
+-->
+<title th:text="#{layoutTitle}">PetClinic :: a Spring Framework demonstration</title>
+<link rel="stylesheet" th:href="@{/webjars/font-awesome/css/font-awesome.min.css}">　　<!--rel：relationship、href：hypertext referenceの略-->
+<link rel="stylesheet" th:href="@{/resources/css/petclinic.css}">
+
+</head>
+
+<body>
+
+	<!--
+		◯ヘッダー部分の作成
+		navタグ：他の文書などへのナビゲーションリンクを提供するためのセクションを表す
+		role="navigation"：音声読み上げ用の設定
+	-->
+	<nav class="navbar navbar-expand-lg navbar-dark" role="navigation">
+		<!--
+			container（フルイドなし）: 画面の左右にほどよい余白を作って中身を中央に集める
+			container-fluid（フルイドあり）: 余白を作らず「流体（fluid）」のように画面全体へ 100% 広がる
+		-->
+		<div class="container-fluid">
+			<a class="navbar-brand" th:href="@{/}"><span></span></a>　　<!--本来はspanタグにブランド名を記入　※今回は未記入-->
+			
+			<!--
+				◯スマホ表示用のメニューボタン設定
+				class="navbar-toggler"：スマホ画面など小画面時にこのボタンを表示
+				data-bs-toggle="collapse"：トグル設定（ボタン押下時に開閉可能にする）
+				data-bs-target="#main-navbar"：id="main-navbar"をトグルのメニューに指定
+			-->
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar">
+				<span class="navbar-toggler-icon"></span>　　<!--Bootstrap標準の三本線アイコン-->
+			</button>
+			
+			<div class="collapse navbar-collapse" id="main-navbar" style>　　<!--styleはたぶん不要-->
+				<!--
+					◯メニューのテンプレートを作成
+					th:remove="all"：ulの要素は全て削除　※テンプレートなので表示不要のため
+					th:fragment="menuItem (link, active, title, glyph, text)"：menyuItemという名前で金型を作成、引数＝材料となる
+					th:class="${active==menu ? 'nav-link active' : 'nav-link'}"：三項演算子 ${  条件  ?  '条件に合うとき（A）'  :  '条件に合わないとき（B）'  }
+					th:href="@{__${link}__}"：プリプロセス（下準備）、URLを作る前に中身の文字を書き換え　※「__」で囲わないと「${link}」という文字列でURLがつくられバグる
+					th:title="${title}"：カーソルホバー時に表示される文字
+					th:class="'fa fa-'+${glyph}"：クラスを動的に追加、glyph（グリフ＝象形文字）fa-homeはフォントオーサムで家のアイコン　※タイムリーフを経由しなければclass="fa fa-home"がデフォで適用
+					th:text="${text}"：textを表示
+					<ul>と<li>：<ul>はUnordered Listの略、リストグループを作る。<li>はList itemの略、箇条書きの1項目を作る
+				-->
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0" th:remove="all">
+					<li th:fragment="menuItem (link, active, title, glyph, text)" th:class="nav-item">　<!--link：URL, active：ページ名, title：ホバー時の説明, glyph：アイコン, text：ボタンの文字-->
+						<a th:class="${active==menu ? 'nav-link active' : 'nav-link'}" th:href="@{__${link}__}" th:title="${title}">
+							<span th:class="'fa fa-'+${glyph}" class="fa fa-home"></span>
+							<span th:text="${text}">Template</span>
+						</a>
+					</li>
+				</ul>
+				
+				<!--ここからメニュー-->
+				<ul class="nav navbar-nav  me-auto">
+					<!--
+						th:replace：タグごと用意したHTMLの部品に「置換」
+						~{}：部品使用の指示 ~{ フォルダ名/ファイル名 :: 部品名 } ※フォルダ名/ファイル名を省略した場合は同じファイルから使用
+					-->
+					<!--ホームメニュー-->
+					<li th:replace="~{::menuItem ('/', 'home', 'home page', 'home', #{home})}">
+						<span class="fa fa-home" aria-hidden="true"></span>　<!--サーバーを起動しない場合表示、aria-hidden="true"：スクリーンリーダー無視-->
+						<span th:text="#{home}">Home</span>　<!--同上-->
+					</li>
+					<!--オーナー検索メニュー-->
+					<li th:replace="~{::menuItem ('/owners/find', 'owners', 'hind owners', 'search', #{findOwners})}">
+						<span class="fa fa-search" aria-hidden="true"></span>
+						<span th:text="#{findOwners}">Find Owners</span>
+					</li>
+					<!--獣医師一覧メニュー-->
+					<li th:replace="~{::menuItem ('/vets.html', 'vets', 'veterinarians', 'th-list', #{vets})}">
+						<span class="fa fa-th-list" aria-hidden="true"></span>
+						<span th:text="#{vets}">Veterinarians</span>
+					</li>
+					<!--エラーメニュー-->
+					<li th:replace="~{::menuItem ('/oups', 'error', 'trigger a RuntimeException to see how it is handled', 'exclamation-triangle', #{error})}">
+						<span class="fa exclamation-triangle" aria-hidden="true"></span>
+						<span th:text="#{error}">Error</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
+	<div class="container-fluid">
+		<div class="container xd-container">
+			<!--
+				◯コンテンツ部分の作成
+				th:block：タイムリーフ専用の目に見えない透明なタグ。本番画面（HTML）には一切残らないのでスタイルを邪魔しない
+				th:insert：用意したHTMLの部品を「挿入」。コンテンツ側から送られてきた<body>タグの中身をはめ込む
+			-->
+			<th:block th:insert="${template}">コンテンツ</th:block>
+			<br />
+			<br />
+			
+			<!--
+				◯フッター部分の作成
+				containetrについて：画面内のコンテンツ（文章、画像、フォームなど）を、見やすく綺麗に整列させたいときに指定（bootstrapではほぼ必須）
+				→row-colを使用する時は必須
+				container：通常のコンテナ。自動で左右に大きな余白を作って、中身を中央の読みやすい幅（約1140pxなど）」に収める
+				container-fluid：フルイド。ヘッダー、フッター、背景画像など、デザインを画面の左端から右端までいっぱいに広げたいときに使用
+				th:src：/resources~から静的リソースの場所を指定可能　※Spring Bootの静的リソースのマッピング機能により、staticフォルダの中身を最上位の階層（ルート）に移動してくれる
+				alt：画像が読み込めなかった場合に表示するテキストを指定
+			-->
+			<div class="container">
+				<div class="row">
+					<div class="col-12 text-center">
+						<img src="../static/images/spring-logo.svg" th:src="@{/resources/images/spring-logo.svg}"
+							alt="VMware Tanzu Logo" class="logo">
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	
+	<script th:src="@{/webjars/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

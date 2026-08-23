@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<!--
+	◯コンテンツを作成し共通レイアウトに引き渡す
+	th:replace：このページを共通テンプレート（レイアウト）に丸ごと置き換え
+	fragments/layout：fragments/layout.htmlファイルを探す
+	:: layout(...)：layout という名前がついた枠組み（部品）を使用
+	(~{::body}, 'home')：引数で<body> の中身（本文）とページ名を渡す
+-->
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::body}, 'home')}">
+
+<body>
+	<h2 th:text="#{welcome}">Welcome</h2>
+	<div class="row">
+		<div class="col-md-12">
+			<img class="img-responsive" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}">
+		</div>
+	</div>
+</body>
+
+</html>
