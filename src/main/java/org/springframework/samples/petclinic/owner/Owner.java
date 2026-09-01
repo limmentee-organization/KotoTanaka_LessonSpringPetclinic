@@ -14,6 +14,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
+import org.springframework.samples.petclinic.model.Person;
+
 /*
  * ◯オーナーエンティティ
  * @Entity：DBに保存（永続化）する対象クラスの目印。Javaが裏側でSQL文を自動生成しテーブル格納（JPAには必須）
@@ -28,7 +30,7 @@ import jakarta.validation.constraints.Pattern;
  */
 @Entity
 @Table(name="owners")
-public class Owner {
+public class Owner extends Person {
 
 	@Column
 	@NotBlank
@@ -76,10 +78,4 @@ public class Owner {
 		return this.pets;
 	}
 
-	
-	
-	
-	
-	
-	
 }

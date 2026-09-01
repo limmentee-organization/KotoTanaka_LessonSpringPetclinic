@@ -16,14 +16,15 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.petclinic.model.NamedEntity;
 
 @Entity
 @Table(name="pets")
-public class Pet {
+public class Pet extends NamedEntity {
 	
 	@Column
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate birthday;
+	private LocalDate birthDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "type_id")
@@ -35,11 +36,11 @@ public class Pet {
 	private final Set<Visit> visits = new LinkedHashSet<>();
 
 	public LocalDate getBirthday() {
-		return this.birthday;
+		return this.birthDate;
 	}
 
 	public void setBirthday(LocalDate birthday) {
-		this.birthday = birthday;
+		this.birthDate = birthday;
 	}
 
 	public PetType getType() {
