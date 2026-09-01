@@ -8,7 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -28,6 +32,32 @@ public class OwnerController {
 	
 	public OwnerController(OwnerRepository owners) {
 		this.owners = owners;
+	}
+	
+	/*
+	 * ◯画面からのデータをJavaオブジェクトのフィールドにセット（バインド）する際のルール
+	 * WebDataBinder：フォームの文字列（例: "firstName"="Taro"）を、Javaオブジェクトに紐付ける役割を持つSpringのバインディング制御オブジェクト
+	 * dataBinder.setDisallowedFields("id", "*.id")：バインドを許可しないフィールド名の指定　※idは自動採番のため
+	 * *.id：*はワイルドカードpet.idなども対象外
+	 */
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id", "*.id");
+	}
+	
+	/*
+	 * ◯OwnerオブジェクトをModelにセットする共通処理
+	 * @ModelAttribute("owner")："owner" というキー名で自動的に Model（画面に渡すデータバケツ）にセット
+	 * 　※コントローラー内のあらゆる @GetMapping や @PostMapping メソッドが呼ばれる前に毎回自動実行
+	 * （@PathVariable(name = "ownerId", required = false) Integer ownerId）：URLからownerIdを引数として受け取る。
+	 * required = false：URLにownerIdが含まれなくてもエラーにせずnullとして受け取る　※デフォルトはrequired = true
+	 */
+	@ModelAttribute("owner")
+	public Owner findOwner(@PathVariable(name = "ownerId", required = false) Integer ownerId) {
+		return ownerId == null ? new Owner() 
+				: this.owners.findById(ownerId)
+					.orElseThrow(() -> new IllegalArgumentException("Owner not found with id: " + ownerId 
+							+ ". Please ensure the ID is correct " + "and the owner exsits in the database."));
 	}
 	
 	/*
@@ -58,7 +88,7 @@ public class OwnerController {
 		Page<Owner> ownersResults = findPaginatedForOwnersLastName(page, lastName);
 		// オーナーが見つからない場合
 		if (ownersResults.isEmpty()) {
-			result.rejectValue("lastName", "notFound", "not found");		// バリデーションエラーを追加　※引数：フィールド名、エラーコード、デフォルトメッセージ 
+			result.rejectValue("lastName", "notFound", "not found");		// バリデーションエラーを追加　※引数：フィールド名、エラーコード、デフォルトメッセージ 　※message.propertiesで上書き
 			return "owners/findOwners";		//オーナー検索画面のHTMLテンプレートを返す
 		}
 		

@@ -13,12 +13,24 @@
 		method="get"：データの送り方の種類（モード）の指定。get＝URLの末尾に文字をのせて送る検索用の送信モード
 		class="form-horizontal"：文字と入力欄を横並びにするBootstrapのデザイン設定
 	-->
-	<form th:action="@{/owners}" method="get" class="form-horizontal" id="search-owner-form">
+	<form th:object="${owner}" th:action="@{/owners}" method="get" class="form-horizontal" id="search-owner-form">
 		<div class="form-group">
 			<div class="control-group" id="lastNameGroup">
 				<label class="col-sm-2 control-label" th:text="#{lastName}">Last name</label>
 				<div class="col-sm-10">
-					<input size="30" maxlength="80">
+					<!--
+						◯フォーム入力欄とバリデーションメッセージの表示
+						th:field：ownerオブジェクトのlastNameフィールドに紐付け
+						　※id="lastName" name="lastName"、value="lastName" が自動生成
+						th:if="${#fields.hasAnyErrors()}"：バリデーションエラーが 1つでも存在する場合<div> タグとその内部を描画
+						th:each="err : ${#fields.allErrors()}"：ループ処理で発生しているエラーをerrに代入
+					-->
+					<input class="form-control" th:field="*{lastName}" size="30" maxlength="80" />
+					<span class="help-inline">
+						<div th:if="${#fields.hasAnyErrors()}">
+							<p th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</p>
+						</div>
+					</span>
 				</div>
 			</div>
 		</div>

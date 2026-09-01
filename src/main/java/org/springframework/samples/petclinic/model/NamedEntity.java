@@ -4,6 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
+/*
+ * ◯ベースエンティティ
+ * @MappedSuperclass：DBの共通項目をまとめるための親クラスを示す
+ */
 @MappedSuperclass
 public class NamedEntity extends BaseEntity {
 

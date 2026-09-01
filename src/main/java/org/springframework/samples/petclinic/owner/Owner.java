@@ -27,6 +27,13 @@ import org.springframework.samples.petclinic.model.Person;
  * 		{10}：10回連続
  * 		例）郵便番号："^\\d{3}-\\d{4}$"、半角の英数字：^[a-zA-Z0-9]+$"
  * - message：入力エラーが起きたときに画面に出す警告メッセージ、 { ... }の書き方でmessage.propertiesから参照
+ * @OneToMany：「1 対 多」のリレーション設定　※Owner 1に対し Pet N
+ * - cascade = CascadeType.ALL：親（Owner）の操作を紐づく子（Pet）に波及（カスケード）させる設定　※デフォルトは設定なし
+ * - fetch = FetchType.EAGER：親を取得する際に子も即時DB読み込み　※デフォルトは FetchType.LAZY（遅延読み込み）
+ * @JoinColumn(name = "owner_id")：子テーブル（pets）側の外部キーを指定。owner_idを使ってOwnerとPetの紐付けを指示
+ * @OrderBy("name")：ORDER BY name ASCと同じ　※降順の場合は @OrderBy("name DESC")
+ * 
+ * - 
  */
 @Entity
 @Table(name="owners")
