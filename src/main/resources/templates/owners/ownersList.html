@@ -14,10 +14,87 @@
 			<th th:text="#{pets}">Pets</th>
 		</thead>
 		<tbody>
+			<!--
+				◯オーナー情報の一覧表示
+				th:each：モデルのlistOwnersのデータを一つづつownerに格納
+			-->
 			<tr th:each="owner : ${listOwners}">
-				
+				<td>
+					<!--
+						◯オーナー別URLの作成
+						__${owner.id}__：__ __で${owner.id}を囲うことでタイムリーフの式だと認識させる　
+						　※囲わないと単なる文字列として認識される
+						　※th:href="@{/owners/{id}(id=${owner.id})}" の書き方でもOK
+					-->
+					<a th:href="@{/owners/__${owner.id}__}" th:text="${owner.firstName + ' ' + owner.lastName}"></a>
+				</td>
+				<td th:text="${owner.address}"></td>
+				<td th:text="${owner.city}"></td>
+				<td th:text="${owner.telephone}"></td>
+				<!--
+					◯ペットをカンマ区切り表示
+					#strings：Thymeleafが用意している文字列操作用の機能
+					　※#はユーティリティオブジェクト。
+							 #strings：文字列操作
+							 #lists：List操作
+							 #sets：Set操作
+							 #maps：Map操作
+							 #dates：日付操作
+							 #numbers：数値操作
+					　※#stringsでは、toUpperCase(), toLowerCase(), length(), contains(), startsWith(), endsWith()などが利用可能
+					 listJoin()：Listの要素を指定した区切り文字で繋ぐ
+				-->
+				<td><span  th:text="${#strings.listJoin(owner.pets, ', ')}"></span></td>
 			</tr>
 		</tbody>
 	</table>
+	<!--
+		◯ページネーション
+	-->
+	<div th:if="${totalPages > 1}">
+		<span th:text="#{pages}">Pages:</span>
+		<span>[</span>
+		<span th:each="i : ${#numbers.sequence(1, totalPages)}">
+			<!--◯ページ番号の表示
+				th:if="${currentPage != i}：今のページが処理ページではない場合リンク付きページ番号表示
+				th:unless="${currentPage != i}：「今のページが処理ページではない」に該当しない場合（処理ページの場合、リンクなしページ番号表示
+				[[${i}]]：Thymeleafのインライン式、タグ中身に直接Thymeleafの式を書ける
+			-->
+			<a th:if="${currentPage != i}" th:href="@{'/owners?page=' + ${i}}">[[${i}]]</a>
+			<span th:unless="${currentPage != i}">[[${i}]]</span>
+		</span>
+		<!--
+			&nbsp;：半角スペースを1つ入れるためのHTML特殊文字　※non-breaking space（改行されないスペース）の略
+		-->
+		<span>]&nbsp;</span>
+		<!--
+			◯先頭の戻るリンク
+		-->
+		<span>
+			<a th:if="${currentPage > 1}" th:href="@{'/owners?page=1'}" th:title="#{first}" class="fa fa-fast-backward"></a>
+			<span th:unless="${currentPage > 1}" th:title="#{first}" class="fa fa-fast-backward"></span>
+		</span>
+		<!--
+			◯1ページ前に戻るリンク
+		-->
+		<span>
+			<a th:if="${currentPage > 1}" th:href="@{'/owners?page=__${currentPage - 1}__'}" th:title="#{previous}" class="fa fa-step-backward"></a>
+			<span th:unless="${currentPage > 1}" th:title="#{previous}" class="fa fa-step-backward"></span>
+		</span>
+		<!--
+			◯1ページ次に進むリンク
+		-->
+		<span>
+			<a th:if="${currentPage < totalPages}" th:href="@{'/owners?page=__${currentPage + 1}__'}" th:title="#{next}" class="fa fa-step-forward"></a>
+			<span th:unless="${currentPage < totalPages}" th:title="#{next}" class="fa fa-step-forward"></span>
+		</span>
+		<!--
+			◯最後尾に進むリンク
+		-->
+		<span>
+			<a th:if="${currentPage < totalPages}" th:href="@{'/owners?page=__${totalPages}__'}" th:title="#{last}" class="fa fa-fast-forward"></a>
+			<span th:unless="${currentPage < totalPages}" th:title="#{last}" class="fa fa-fast-forward"></span>
+		</span>
+	</div>
 </body>
 </html>

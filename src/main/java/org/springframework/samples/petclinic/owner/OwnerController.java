@@ -108,7 +108,7 @@ public class OwnerController {
 	private String addPaginationModel(int page, Model model, Page<Owner> paginated) {
 		List<Owner> listOwners = paginated.getContent();		// - getContent()： 1ページに表示するための、実際のOwnerデータ
 		model.addAttribute("currentPage", page);		// @RequestParamで受け撮った現在のページ
-		model.addAttribute("totalPage", paginated.getTotalPages());		// 全部で何ページ分あるかの数字
+		model.addAttribute("totalPages", paginated.getTotalPages());		// 全部で何ページ分あるかの数字
 		model.addAttribute("totalItems", paginated.getTotalElements());		//データベースに全部で何人登録されているかの総数
 		model.addAttribute("listOwners", listOwners);
 		return "owners/ownersList";
@@ -132,7 +132,4 @@ public class OwnerController {
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
 		return owners.findByLastNameStartingWith(lastname, pageable);
 	}
-	
-	
-	
 }
