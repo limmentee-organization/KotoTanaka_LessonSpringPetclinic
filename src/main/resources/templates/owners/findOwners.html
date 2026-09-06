@@ -27,7 +27,7 @@
 					-->
 					<input class="form-control" th:field="*{lastName}" size="30" maxlength="80" />
 					<span class="help-inline">
-						<div th:if="${#fields.hasAnyErrors()}">
+						<div th:if="${#fields.hasAnyErrors()}">		<!--#"fields：Thymeleaf 組み込みのエラー情報用オブジェクトを指定-->
 							<p th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</p>
 						</div>
 					</span>
