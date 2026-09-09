@@ -32,8 +32,6 @@ import org.springframework.samples.petclinic.model.Person;
  * - fetch = FetchType.EAGER：親を取得する際に子も即時DB読み込み　※デフォルトは FetchType.LAZY（遅延読み込み）
  * @JoinColumn(name = "owner_id")：子テーブル（pets）側の外部キーを指定。owner_idを使ってOwnerとPetの紐付けを指示
  * @OrderBy("name")：ORDER BY name ASCと同じ　※降順の場合は @OrderBy("name DESC")
- * 
- * - 
  */
 @Entity
 @Table(name="owners")

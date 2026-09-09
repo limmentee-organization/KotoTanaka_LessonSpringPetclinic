@@ -137,14 +137,22 @@ public class OwnerController {
 	
 	/*
 	 * ◯オーナー詳細画面表示
+	 * ModelAndView：ViewとModelをまとめて返す。以下のコードと同じ。
+	 * public String showOwner(@PathVariable("ownerId") int ownerId, Model model){
+	 * 		Optional<Owner> optionalOwner  = this.owner.findById(ownerId);
+	 * 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
+				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct"));
+	 * 		model.addAttribute("owner", owner);
+	 * 		return "owners/ownerDetails";
+	 * }
 	 */
 	@GetMapping("/owners/{ownerId}")
 	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
-		ModelAndView mav = new ModelAndView("owners/ownerDetails");		//owners/ownerDetails.htmlを指定
+		ModelAndView mav = new ModelAndView("owners/ownerDetails");		//view：owners/ownerDetails.htmlを指定
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(
 				"Owner not found with id: " + ownerId + ". Please ensure the ID is correct"));
-		mav.addObject(owner);
-		return mav;
+		mav.addObject(owner);		// mav.addObject("owner", owner);と同じ。ModelAndViewを使用する時はaddObjectを使用
+		return mav;		// ModelAndViewオブジェクトを返すようにする
 	}
 }

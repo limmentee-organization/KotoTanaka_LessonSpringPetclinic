@@ -35,11 +35,11 @@ public class Pet extends NamedEntity {
 	@OrderBy("date ASC")
 	private final Set<Visit> visits = new LinkedHashSet<>();
 
-	public LocalDate getBirthday() {
+	public LocalDate getBirthDate() {
 		return this.birthDate;
 	}
 
-	public void setBirthday(LocalDate birthday) {
+	public void setBirthDate(LocalDate birthday) {
 		this.birthDate = birthday;
 	}
 
