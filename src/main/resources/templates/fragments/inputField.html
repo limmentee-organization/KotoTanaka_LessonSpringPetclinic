@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org">
+
+<body>
+	<form>
+		<!--
+			◯フォームの項目の部品生成
+			th:block：画面上には何も出力しない処理用の箱、条件成立時タグを残さない
+			th:fragment：部品生成、th:replace="~{fragments/inputField :: input (#{firstName}, firstName, 'text')}"で呼び出す
+			th:with：一時的な変数を作る、このタグ内でvalidという変数が使用可能
+			#fields：Springのフォームに関する情報を調べるための便利オブジェクト
+			#fields.hasErrors(name)：name というフィールドにバリデーションエラーがあるかをtrue, falseで返す
+				エラーなし → valid = true
+				エラーあり → valid = false
+		-->
+		<th:block th:fragment="input(label, name, type)">
+			<div th:with="valid=${!#fields.hasErrors(name)}" th:class="${'form-group' + (valid ? '' : ' has-error')}" class="form-group">
+				<!--
+					◯ラベルと入力欄の作成
+					th:for=${name}：このラベルとid（th:field） = ${name} の入力欄を紐付け
+				-->
+				<label th:for="${name}" class="col-sm-2 control-label" th:text="${label}">Label</label>
+				<div class="col-sm-10">
+					<div th:switch="${type}">
+						<input th:case="text" class="form-control" type="text" th:field="*{__${name}__}">
+						<input th:case="date" class="form-control" type="date" th:field="*{__${name}__}" th:min="${minVisitDate}">　<!---->
+					</div>
+					<!--
+						◯アイコン・メッセージ表示
+						aria-hidden="true"：スクリーンリーダーなどでの読み上げ不要
+						th:errors="*{__${name}__}"：nameにエラーがあればそのエラーメッセージを表示
+						th:text="#{error}"：メッセージプロパティーズからErrorを表示　※これ多分いらない。
+					-->
+					<span th:if="${valid}" class="fa fa-ok form-control-feedback" aria-hidden="true"></span>　<!--fa-okというアイコンが表示されない-->
+					<th:block th:if="${!valid}">
+						<span class="fa fa-remove form-control-feedback" aria-hidden="true"></span>
+						<span class="help-inline" th:errors="*{__${name}__}" th:text="#{error}">Error</span>
+					</th:block>
+				</div>
+			</div>
+		</th:block>
+	</form>
+
+</body>
+</html>

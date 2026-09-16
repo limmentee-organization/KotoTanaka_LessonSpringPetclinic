@@ -20,7 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class OwnerController {
 
-//	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
+	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 	
 	/*
 	 * ◯コンストラクタ注入（推奨）
@@ -133,6 +133,14 @@ public class OwnerController {
 		int pageSize = 5;
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
 		return owners.findByLastNameStartingWith(lastname, pageable);
+	}
+	
+	/*
+	 * ◯オーナー情報更新画面表示
+	 */
+	@GetMapping("/owners/{ownerId}/edit")
+	public String initUpdateOwnerForm() {
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 	
 	/*

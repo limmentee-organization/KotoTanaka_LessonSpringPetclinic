@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{:: body}, 'owners')}">
+
+<body>
+	<h2 th:text="#{owner}">Owner</h2>
+	<form th:object="${owner}" class="form-horizontal" id="add-owner-form" method="post">
+		<div class="form-group has-feedback">
+			<input th:replace="~{fragments/inputField :: input (#{firstName}, firstName, 'text')}">
+			<input th:replace="~{fragments/inputField :: input (#{lastName}, lastName, 'text')}">
+			<input th:replace="~{fragments/inputField :: input (#{address}, address, 'text')}">
+			<input th:replace="~{fragments/inputField :: input (#{city}, city, 'text')}">
+			<input th:replace="~{fragments/inputField :: input (#{telephone}, telephone, 'text')}">
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<!--
+					◯新規登録か更新かでボタンに表示するテキストを変える
+					th:with：一時的な変数を作る
+					${owner['new']} ：Ownerオブジェクトのnewというプロパティを指定
+						getName：nameというプロパティで扱える
+						isNew：（booktean型の場合）newというプロパティで扱える
+						→owner.idがなければ新規登録、あれば更新処理
+				-->
+				<button th:with="text=${owner['new']} ? #{addOwner} : #{updateOwner}" class="btn btn-primary" type="submit"
+					th:text="${text}">Add Owner</button>
+			</div>
+		</div>
+	</form>
+</body>
+</html>
