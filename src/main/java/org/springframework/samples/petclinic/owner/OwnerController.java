@@ -1,7 +1,10 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,8 +17,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class OwnerController {
@@ -141,6 +146,42 @@ public class OwnerController {
 	@GetMapping("/owners/{ownerId}/edit")
 	public String initUpdateOwnerForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
+	
+	/*
+	 * ◯オーナー情報更新処理
+	 * @Valid：バリデーションチェックのスイッチ　※@Validatedはグループ分けも可能になるが通常は@ValidでOK
+	 * RedirectAttributes と addFlashAttribute：
+	 * バリデーションエラーの場合はhtmlテンプレートを返し、PRGにしない。
+	 * →入力内容とエラーをそのまま画面に戻すため（ユーザー入力値は保存される）
+	 * →PRGパターンにすると別のGETリクエストとなり引き継がれない
+	 * Objects.equals(owner.getId(), ownerId)：null安全で比較可能、Integer型とint型の比較
+	 * result.rejectValue：BindingResultに手動でエラーを追加する。項目（フィールド）, エラーコード, エラーメッセージの順で引数に渡す
+	 * 
+	 */
+	@PostMapping("/owners/{ownerId}/edit")
+	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, 
+			@PathVariable("ownerId") int ownerId, RedirectAttributes redirectAttribute) {
+		
+		// バリデーションチェック
+		if (result.hasErrors()) {
+			redirectAttribute.addFlashAttribute("error", "There was an error in updateing the owner.");		// PRGパターンではないのでmodel.addAttributeでも良さそう
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
+		
+		// idの不正リクエストチェック
+		if (!Objects.equals(owner.getId(), ownerId)) {
+			result.rejectValue("id", "mismatch", "The owner ID in the form dose not match the URL.");
+			redirectAttribute.addFlashAttribute("error", "Owner ID mismatch. Please try again.");
+			return "redirect:/owners/{ownerId}/edit";
+		}
+		
+		// オーナー情報更新処理
+		owner.setId(ownerId);
+		this.owners.save(owner);
+		redirectAttribute.addFlashAttribute("message", "Owner Values Updated");
+		return "redirect:/owners/{ownerId}";
+		
 	}
 	
 	/*

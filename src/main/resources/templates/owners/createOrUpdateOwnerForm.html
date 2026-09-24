@@ -3,6 +3,7 @@
 
 <body>
 	<h2 th:text="#{owner}">Owner</h2>
+	<!--th:actionがない場合、HTMLの仕様上、現在表示しているページのURLに対してリクエストが送信される-->
 	<form th:object="${owner}" class="form-horizontal" id="add-owner-form" method="post">
 		<div class="form-group has-feedback">
 			<input th:replace="~{fragments/inputField :: input (#{firstName}, firstName, 'text')}">

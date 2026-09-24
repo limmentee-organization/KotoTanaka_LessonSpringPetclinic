@@ -2,10 +2,17 @@
 
 <!--
 	◯コンテンツを作成し共通レイアウトに引き渡す
+	th:replace="~{fragments/layout :: layout(~{::body},'home')}"：引数を渡して、layoutを呼び出している
 	th:replace：このページを共通テンプレート（レイアウト）に丸ごと置き換え
 	fragments/layout：fragments/layout.htmlファイルを探す
 	:: layout(...)：layout という名前がついた枠組み（部品）を使用
 	(~{::body}, 'home')：引数で<body> の中身（本文）とページ名を渡す
+	※fragments/layout：Thymeleafは自動で"src/main/resources/templates/"をルートとするのでfragmentから書き始められる
+	※フラグメント式 ~{...}は、ルート（templates 直下）から探し始めるルール。∴絶対参照にしなくても良い
+	※【HTML専用ルート】：src/main/resources/templates/
+	※【画像・CSS・JavaScript専用のルート（静的リソース）】：src/main/resources/static/
+	絶対参照：/を先頭につけてルートからの道順を指定
+	相対参照：/を先頭につけない。今いるフォルダからの道順を指定
 -->
 <html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::body}, 'home')}">
 
