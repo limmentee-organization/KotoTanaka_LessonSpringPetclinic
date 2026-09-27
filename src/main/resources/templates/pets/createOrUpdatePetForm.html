@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{:: body}, 'owners')}">
+<body>
+
+	<h2>
+		<!--
+			◯タイトルの条件分岐
+			・新規登録ならNewPet そうでなければPet
+			・${pet['new']}：HTML側で ${pet['new']} と書くと、Java内部で pet.isNew() が実行される
+			　→基底クラスからtrue or falseが返る
+		-->
+		<th:block th:if="${pet['new']}" th:text="#{new}">New</th:block>
+		<span th:text="#{pet}">Pet</span>
+	</h2>
+	<form th:object="${pet}" class="form-horizontal" method="post">
+		<input type="hidden" name="id" th:value="*{id}">
+		
+		<!--
+			◯入力エリア
+			・class="form-group"：Bootstrapでフォームの入力項目とラベルをグループ化し見栄えや余白を整える
+		-->
+		<div class="form-group has-feedback">
+			<div class="form-group">
+				<label class="col-sm-2 control-label" th:text="#{owner}">Owner</label>
+				<div class="col-sm-10">
+					<span th:text="${owner?.firstName + ' ' + owner?.lastName}"></span>
+				</div>
+			</div>
+			<!--
+				◯インプットエリア部品に差し替え
+				・th:replace：元のタグごと新しい部品に完全に置き換わるため、元のタグが <input> でも <select> でも動作上の違いはない
+			-->
+			<input th:replace="~{fragments/inputField :: input('Name', 'name', 'text')}">
+			<input th:replace="~{fragments/inputField :: input('Birth Date', 'birthDate', date)}">
+			<input th:replace="~{fragments/selectField :: select('Tyoe', 'type', ${types})}">
+		</div>
+		<!--
+			◯送信ボタンエリア
+		-->
+		<div class="form-group">
+			<div class="col-sm-offset2 col-sm-10">
+				<button th:with="text=${pet['new']} ? 'Add Pet' : 'Update Pet'" class="btn btn-primary" type="submit"
+					th:text="${text}">Add Pet</button>
+		</div>
+	</form>
+	
+</body>
+</html>

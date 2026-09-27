@@ -83,4 +83,26 @@ public class Owner extends Person {
 		return this.pets;
 	}
 
+	public void addPet(Pet pet) {
+		if (pet.isNew()) {
+			// List<Pet>を取得し、新たなPetをリスト追加
+			getPets().add(pet);
+		}
+	}
+	
+	/*
+	 * ◯PetIdに基づき対象のペットを返す
+	 * ・対象のペットIdがない場合はnullを返す
+	 */
+	public Pet getPet(Integer id) {
+		for (Pet pet : getPets()) {
+			if (!pet.isNew()) {
+				Integer compId = pet.getId();		// compId ： 比較のために取り出したID（Comparing ID）
+				if (compId == id) {
+					return pet;
+				}
+			}
+		}
+		return null;
+	}
 }
