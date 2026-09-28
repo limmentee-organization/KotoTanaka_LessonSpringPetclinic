@@ -105,4 +105,20 @@ public class Owner extends Person {
 		}
 		return null;
 	}
+	
+	/*
+	 * ◯PetNameに基づき対象のペットを返す
+	 * ・boolean ignoreNew: 新規作成中（id == null）のペットを無視する（true）か、検索対象に含める（false）か制御するフラグ
+	 */
+	public Pet getPet(String name, boolean ignoreNew) {
+		for (Pet pet : getPets()) {
+			String compName = pet.getName();
+			if (compName != null && compName.equalsIgnoreCase(name)) {
+				if (!ignoreNew || !pet.isNew()) {
+					return pet;
+				}
+			}
+		}
+		return null;
+	}
 }
