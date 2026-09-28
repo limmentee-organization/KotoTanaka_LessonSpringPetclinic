@@ -145,14 +145,19 @@ public class PetController {
 			owner.addPet(pet);
 			this.owners.saveAndFlush(owner);
 		} catch(DataIntegrityViolationException ex) {
-			if (!isDuplicatePetNameViolation(ex)) {
+			if (!isDuplicatePetNameViolation(ex)) {		// DBレベルの名前重複以外の予期せぬ例外はそのままスロー
 				throw ex;
 			}
-			result.rejectValue("name", "duplicate", "already exsist");
+			result.rejectValue("name", "duplicate", "already exsist");		// 名前重複の場合はBindingResultのnameフィールドにエラー追加
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 		}
 		redirectAttributes.addFlashAttribute("message", "New Pet has been Added");
 		return "redirect:/owners/{ownerId}";
+	}
+	
+	@GetMapping("/pets/{petId}/edit")
+	public String initUpdateForm() {
+		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 	
 	// ◯更新処理 
