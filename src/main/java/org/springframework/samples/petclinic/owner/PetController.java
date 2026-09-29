@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -125,9 +126,9 @@ public class PetController {
 		 // ◯名前の重複チェック
 		String petName = pet.getName();
 		if(StringUtils.hasText(petName)) {		// 名前が空白じゃなければ進む
-			Pet existingPet = owner.getPet(petName, false);		// 同じ名前を検索、falseのため新規登録の場合（id=null）も無視しない
+			Pet existingPet = owner.getPet(petName, false);		// 同じ名前を検索、false=新規登録の場合（id=null）も無視しない
 			if (existingPet != null && !Objects.equals(existingPet.getId(), pet.getId())) {		// 同じ名前のペットとIdが一致しない（同じ名前ですでに登録済み）の場合
-				result.rejectValue("name", "duplicate", "already exists");
+				result.rejectValue("name", "duplicate", "already exists");		// messages.propertiesに定義されているduplicate=...が優先される
 			}
 		}
 		
@@ -152,22 +153,82 @@ public class PetController {
 			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 		}
 		redirectAttributes.addFlashAttribute("message", "New Pet has been Added");
-		return "redirect:/owners/{ownerId}";
+		return "redirect:/owners/{ownerId}";		// {ownerId}=プレースホルダ：RedirectView（リダイレクトを処理するコンポーネント）がModelからownerIdを抽出
 	}
 	
+	/*
+	 * ◯ペット情報更新画面初期表示
+	 */
 	@GetMapping("/pets/{petId}/edit")
 	public String initUpdateForm() {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 	
-	// ◯更新処理 
-//	private void updatePetDetails(Owner owner, Pet pet) {
-//		Integer id = pet.getId();
-//		Assert.state(id != null, "'pet.getId()' must not be null");
-//		
-//		Pet existingPet = owner.getPet(id);
-//		if()
-//	}
+	/*
+	 * ◯ペット情報更新処理
+	 */ 
+	@PostMapping("/pets/{petId}/edit")
+	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
+			RedirectAttributes redirectAttributes) {
+		
+		 // ◯名前の重複チェック
+		String petName = pet.getName();
+		if(StringUtils.hasText(petName)) {		// 名前が空白じゃなければ進む
+			Pet existingPet = owner.getPet(petName, false);		// 同じ名前を検索、false=新規登録の場合（id=null）も無視しない
+			if (existingPet != null && !Objects.equals(existingPet.getId(), pet.getId())) {		// 同じ名前のペットとIdが一致しない（同じ名前ですでに登録済み）の場合
+				result.rejectValue("name", "duplicate", "already exists");
+			}
+		}
+		
+		// ◯誕生日の不正チェック
+		LocalDate currentDate = LocalDate.now();
+		if (pet.getBirthDate() != null && pet.getBirthDate().isAfter(currentDate)) {
+			result.rejectValue("birthDate", "typeMismatch.birthDate");
+		}
+		
+		if (result.hasErrors()) {
+			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		}
+		
+		try {
+			updatePetDetails(owner, pet);
+		}
+		catch (DataIntegrityViolationException ex){
+			if (!isDuplicatePetNameViolation(ex)) {
+				throw ex;
+			}
+			result.rejectValue("name", "duplicate", "already exsist");		// 名前重複の場合はBindingResultのnameフィールドにエラー追加
+			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		}
+		redirectAttributes.addFlashAttribute("message", "Pet details has been edited");
+		return "redirect:/owners/{ownerId}";
+		
+	}
+	
+	
+	/*
+	 * ◯ペット情報更新処理
+	 */
+	private void updatePetDetails(Owner owner, Pet pet) {
+		/*
+		 * ◯ペットIDのnullチェック（アサーション）
+		 * ・Assert: Spring Framework が提供するユーティリティクラス（org.springframework.util.Assert）
+		 * ・Assert.state(条件, メッセージ) ：条件が false の時に IllegalStateException を投げる（null なら即座にエラーを出して処理を止める）
+		 */
+		Integer id = pet.getId();
+		Assert.state(id != null, "'pet.getId()' must not be null");
+		
+		// ペット情報の詰めかえ
+		Pet existingPet = owner.getPet(id);
+		if (existingPet != null) {		// ペットがnull出なければ詰め替え
+			existingPet.setName(pet.getName());
+			existingPet.setBirthDate(pet.getBirthDate());
+			existingPet.setType(pet.getType());
+		} else {
+			owner.addPet(pet);
+		}
+		this.owners.saveAndFlush(owner);
+	}
 	
 	/*
 	 * ◯DBのユニーク制約違反判定
