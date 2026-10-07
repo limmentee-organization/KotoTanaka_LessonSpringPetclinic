@@ -68,6 +68,16 @@ public class OwnerController {
 	}
 	
 	/*
+	 * ◯オーナー登録
+	 */
+	@GetMapping("/owners/new")
+	public String initCreationForm() {
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
+	
+	
+	
+	/*
 	 * ◯オーナー検索ページ
 	 * @GetMapping：ユーザーからのGETリクエストを捕捉する
 	 * (...)内はアドレスバーのURLと一致させる
@@ -78,6 +88,18 @@ public class OwnerController {
 	public String initFindForm() {
 		return "owners/findOwners";
 	}
+	
+	@PostMapping("/owners/new")
+	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "There was an error in creating the owner");
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
+		
+		this.owners.save(owner);
+		return "redirect:/owners/" + owner.getId();
+	}
+	
 	
 	/*
 	 * ◯オーナー一覧の取得
