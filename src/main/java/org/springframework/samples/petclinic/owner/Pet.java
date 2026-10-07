@@ -55,6 +55,8 @@ public class Pet extends NamedEntity {
 		return this.visits;
 	}
 	
-	
+	public void addVisit(Visit visit) {
+		getVisits().add(visit);
+	}
 
 }

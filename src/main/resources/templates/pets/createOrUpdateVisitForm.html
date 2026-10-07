@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body}, 'owners')}">
+<body>
+
+	<h2>
+		<th:block th:if="${visit['new']}" th:text="#{new}">New</th:block>
+		Visit
+	</h2>
+	
+	<b th:text="#{pet}">Pet</b>		<!--ボールドタグ-->
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th th:text="#{name}">Name</th>
+				<th th:text="#{birthDate}">Birth Date</th>
+				<th th:text="#{type}">Type</th>
+				<th th:text="#{owner}">Owner</th>
+			</tr>
+		</thead>
+		<tr>
+			<td th:text="${pet.name}"></td>
+			<td th:text="${#temporals.format(pet.birthDate, 'yyyy-MM-dd')}"></td>
+			<td th:text="${pet.type}"></td>
+			<!--
+				◯ ? の機能：セーフナビゲーション演算子
+				・nullチェックをし、nullの場合エラーにせず空白表示
+				・${owner?.firstName}：owner が null かどうかを自動的にチェック
+				　→owner に値がある場合：通常通り firstName の値を取得
+				　→owner が null の場合：エラーにせず、評価をその時点で中断して null（画面上は何も表示しない空文字） として扱う
+			-->
+			<td th:text="${owner?.firstName + ' ' + owner?.lastName}"></td>
+		</tr>
+	</table>
+	
+	<form th:object="${visit}" class="form-horizontal" method="post">
+		<div class="form-group has-feedback">
+			<input th:replace="~{fragments/inputField :: input('Date', 'date', 'date')}" />
+			<input th:replace="~{fragments/inputField :: input('Description', 'description', 'text')}" />
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<input type="hidden" name="petId" th:value="${pet.id}" />
+				<button class="btn btn-primary" type="submit" th:text="#{addVisit}">Add Visit</button>
+			</div>
+		</div>
+	</form>
+	
+	<br />
+	<b th:text="#{previousVisits}">PreviousVisits</b>
+	<table class="table table-striped">
+		<tr>
+			<th th:text="#{date}">Date</th>
+			<th th:text="#{description}">Discription</th>
+		</tr>
+		<tr th:if="${!visit['new']}" th:each="visit : ${pet.visits}">
+			<td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></td>
+			<td th:text="${visit.description}"></td>
+		</tr>
+	</table>
+</body>
+</html>

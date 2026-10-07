@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.owner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import org.springframework.samples.petclinic.model.Person;
+import org.springframework.util.Assert;
 
 /*
  * ◯オーナーエンティティ
@@ -98,7 +100,7 @@ public class Owner extends Person {
 		for (Pet pet : getPets()) {
 			if (!pet.isNew()) {
 				Integer compId = pet.getId();		// compId ： 比較のために取り出したID（Comparing ID）
-				if (compId == id) {
+				if (Objects.equals(compId, id)) {
 					return pet;
 				}
 			}
@@ -121,4 +123,15 @@ public class Owner extends Person {
 		}
 		return null;
 	}
+	
+	public void addVisit(Integer petId, Visit visit) {
+		Assert.notNull(petId, "Pet identifier must not be null!");
+		Assert.notNull(visit, "Visit must not be null!");
+		
+		Pet pet = getPet(petId);
+		Assert.notNull(pet, "Invalid Pet identifier!");
+		
+		pet.addVisit(visit);
+	}
+	
 }

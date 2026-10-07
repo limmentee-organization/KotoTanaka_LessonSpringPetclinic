@@ -46,7 +46,7 @@ public class PetValidator implements Validator {
 	}
 
 	/*
-	 * ◯Pet専用バリデータ出あることの宣言
+	 * ◯Pet専用バリデータであることの宣言
 	 * ・このバリデータは Pet クラス（またはそのサブクラス）のデータチェック専用であることをSpringに宣言
 	 * ・Class<?> clazz: 引数で渡された clazz が、Pet クラスまたは Petのサブクラスであるかを判定
 	 * ・このバリデータでチェック可能な型であれば true、対応していない型であれば false を返す
