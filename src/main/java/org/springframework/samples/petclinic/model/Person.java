@@ -5,7 +5,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@MappedSuperclass
+@MappedSuperclass		// JPAが提供するアノテーション。複数エンティティで共通するフィールドをまとめる親クラスに使用
 public class Person extends BaseEntity {
 
 	@Column(length = 30)
